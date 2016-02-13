@@ -1,0 +1,45 @@
+diff --git a/main/nginx/APKBUILD b/main/nginx/APKBUILD
+index 2586363..bccc106 100644
+--- a/main/nginx/APKBUILD
++++ b/main/nginx/APKBUILD
+@@ -3,7 +3,7 @@
+ # Contributor: Bartłomiej Piotrowski <nospam@bpiotrowski.pl>
+ 
+ pkgname=nginx
+-pkgver=1.8.1
++pkgver=1.9.11
+ pkgrel=1
+ pkgdesc="HTTP and reverse proxy server"
+ url="http://www.nginx.org/en"
+@@ -19,14 +19,14 @@ depends="$pkgname-common !$pkgname-rtmp !$pkgname-lua"
+ # Modules
+ _lua_mod=lua-nginx-module
+ _lua_dir=$_lua_mod
+-_lua_ver=0.10.0
++_lua_ver=0.10.1rc0
+ 
+ _rtmp_mod=nginx-rtmp-module
+ _rtmp_dir=$_rtmp_mod
+ _rtmp_ver=1.1.7
+ 
+-_devkit_mod=nginx-devel-kit
+-_devkit_dir=ngx_devel_kit
++_devkit_mod=ngx_devel_kit
++_devkit_dir=$_devkit_mod
+ _devkit_ver=0.2.19
+ 
+ makedepends="perl-dev pcre-dev openssl-dev zlib-dev luajit-dev paxmark linux-headers"
+@@ -74,10 +74,12 @@ _build() {
+ 		--with-http_ssl_module \
+ 		--with-http_stub_status_module \
+ 		--with-http_gzip_static_module \
+-		--with-http_spdy_module \
++		--with-http_v2_module \
+ 		--with-http_auth_request_module \
+ 		--with-mail \
+ 		--with-mail_ssl_module \
++		--with-stream \
++		--with-stream_ssl_module \
+ 		$@ || return 1
+ 	make || return 1
+ 	mv objs/$pkgname objs/$binary
