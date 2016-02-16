@@ -21,32 +21,27 @@ License
 BSD 2-Clause, see accompanying LICENSE file.
 
 
-Requirements
-------------
-
- - bash
- - docker 1.5+
-
-
 Usage
 -----
 
-```bash
-./build.sh
-```
-
-This will build and tag an `nginx:alpine` image which can be run directly:
+The latest build of this image (1.9.11) is available on [Docker Hub](https://hub.docker.com/r/huguesb/alpinx/)
 
 ```
-docker run -p 8080:80 nginx:alpine
+docker run -p 8080:80 huguesb/alpinx
 ```
 
-Or used as base image:
+Or
 
 ```
-FROM nginx:alpine
+FROM hugues/alpinx
 ...
 ```
+
+Build Requirements
+------------------
+
+ - bash
+ - docker 1.5+
 
 
 Implentation details
@@ -69,6 +64,13 @@ To build this image from scratch, a two-step process is required:
 
  2. Install the package(s) into a docker image
 
+    ```bash
+    ./build.sh
+    ```
+
+    This will build and tag `huguesb/alpinx` locally, instead of fetching it
+    from [Docker Hub](https://hub.docker.com/r/huguesb/alpinx/).
+
     Doing the second step "right" is a little convoluted due to limitations
     of the `docker build` command. In particular, it is not possible to
     access files from the build context in a RUN statement. One could use
@@ -78,7 +80,4 @@ To build this image from scratch, a two-step process is required:
     To be easily integrated in a containerized CI, this script eschews
     explicit mapping of volumes to host folders, which requires additional
     contorsions.
-
-    If you're interested in the gory details, take a look at `build.sh`
-
 

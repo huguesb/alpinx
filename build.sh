@@ -12,7 +12,7 @@ THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "$THIS_DIR/img_fresh.sh"
 
-IMAGE=nginx:alpine
+IMAGE=huguesb/alpinx
 
 # Only rebuild if needed to prevent cache busting
 if img_fresh $IMAGE $THIS_DIR ; then
@@ -25,20 +25,20 @@ tee "$TMP" <<EOF
 FROM alpine:3.3
 ADD apk/x86_64 /apk/x86_64
 EOF
-docker build -t nginx-cxt -f "$TMP" "$THIS_DIR"
+docker build -t $IMAGE-cxt -f "$TMP" "$THIS_DIR"
 rm -f "$TMP"
 
 # step 2: get data from image to volume
-docker run --name=nginx-cxt -v /cxt nginx-cxt cp -R /apk/x86_64 /cxt/
+docker run --name=alpinx-cxt -v /cxt $IMAGE-cxt cp -R /apk/x86_64 /cxt/
 
 # step 3: use data from volume in command
-docker run --name=nginx-build \
-    --volumes-from nginx-cxt \
+docker run --name=alpinx-build \
+    --volumes-from alpinx-cxt \
     alpine:3.3 \
     sh -c 'apk -U add nginx --repository /cxt --allow-untrusted && rm -rf /var/cache/apk/*'
 
 # step 4: commit resulting layer
-docker commit nginx-build $IMAGE
+docker commit alpinx-build $IMAGE
 
 docker build -t $IMAGE - <<EOF
 FROM $IMAGE
@@ -50,7 +50,7 @@ CMD ["nginx", "-g", "daemon off;"]
 EOF
 
 # cleanup intermediate containers
-docker rm -f nginx-build
-docker rm -f nginx-cxt
-docker rmi nginx-cxt
+docker rm -f alpinx-build
+docker rm -f alpinx-cxt
+docker rmi $IMAGE-cxt
 
